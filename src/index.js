@@ -5,17 +5,26 @@ const taskRouter = require('./routers/task')
 
 const app = express()
 const port = process.env.PORT || 3000
-// app.use((req, res, next)=>{
-//   if(req.method === 'GET'){
-//     res.send('GET requests are disabled')
-//   }else{
-//     next()
-//   }
-// })
 
-// app.use((req, res, next)=>{
-//   res.status(503).send('site is currently down. Check back soon!')
-// })
+const multer = require('multer')
+const upload = multer({
+  dest: 'images',
+  limits: {
+    fileSize: 1000000
+  }, 
+  fileFilter(req, file, cb) {
+    if(!file.originalname.match(/\.(doc|docx)$/)){
+      return cb(new Error('Please upload a word document'))
+    }
+    cb(undefined, true)
+  }
+}) 
+app.post('/upload', upload.single('upload'), (req, res)=>{
+  res.send()
+}, (error, req, res, next)=>{
+  res.status(400).send({ error: error.message })
+})
+
 
 app.use(express.json())
 app.use(userRouter)
@@ -29,25 +38,4 @@ app.listen(port, ()=>{
 
 
 
-// const Task = require('./models/task')
 
-// const main = async () => {
-//   // const task = await Task.findById('')
-//   // await task.populate('owner').execPopulate()
-//   // console.log(task.owner)
-
-//   const user = await User.findById('')
-//   await user.populate('tasks').execPopulate()
-//   console.log(user.tasks)
-// }
-// main()
-// const jwt = require('jsonwebtoken')
-
-// const myFunction = async ()=>{
-//   const token = jwt.sign({_id:'bvj212' },'thisismycourse',{expiresIn:'7days'})
-//   console.log('myfunc::'+token) 
-
-//   const data=jwt.verify(token, 'thisismycourse')
-//   console.log('myfunc data::'+data)
-// }
-// myFunction()
